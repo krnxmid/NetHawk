@@ -4,90 +4,123 @@ from contextlib import suppress
 import datetime
 import re
 
+# Regular expression to remove ANSI escape sequences (used for colored outputs)
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
-class PktSniffer:
-    def __init__(self, interface="Wi-fi"):
-        self.interface = interface # Interface for sniffing
-        self.capturing = None # Capture object
-        self.is_running = True # Flag to control capturing state
-        self.raw = False
+class PacketSniffer:
+    def __init__(self, interface="Wi-Fi"):
+        """
+        Initializes the packet sniffer.
+        :param interface: The network interface to capture packets from.
+        """
+        self.interface = interface  # Interface for sniffing
+        self.capture = None  # Pyshark capture object
+        self.is_running = True  # Flag to control capturing state
+        self.raw = False  # Whether to show raw packet data
     
     def log_packet(self, packet):
-        """Logs packet details to a file (removes ANSI escape sequences)."""
-        cleaned_packet = ANSI_ESCAPE.sub('', str(packet))  # Remove ANSI codes
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        with open("NetHawk/packet_log.txt", "a", encoding="utf-8") as log:
-            log.write(f"{packet.sniff_time} | {packet.ip.src} -> {packet.ip.dst} | {packet.highest_layer} | Length: {packet.length}\n")
+        """
+        Logs packet details to a file while removing ANSI escape sequences.
+        :param packet: Captured packet object.
+        """
+        try:
+            cleaned_packet = ANSI_ESCAPE.sub('', str(packet))  # Remove ANSI codes
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Log packet details into a file
+            with open("NetHawk/packet_log.txt", "a", encoding="utf-8") as log:
+                log.write(f"{timestamp} | {packet.ip.src} -> {packet.ip.dst} | "
+                          f"{packet.highest_layer} | Length: {packet.length}\n")
+        except AttributeError:
+            pass  # Skip packets without IP layer
 
-    
-    def setup_capture(self, filter):
-        """Setup a Capture Object"""
-        print("[+] Created Capture Object")
+    def setup_capture(self, filter=None):
+        """
+        Sets up the packet capture object.
+        :param filter: A BPF (Berkeley Packet Filter) string to filter packets.
+        """
+        print("[+] Creating Capture Object...")
         self.capture = pyshark.LiveCapture(interface=self.interface, bpf_filter=filter)
-    
+
     def handle_interrupt(self, signum, frame):
-        """To Handle Interrupts Gracefully"""
+        """
+        Gracefully handles interrupt signals (Ctrl+C).
+        """
         self.is_running = False
-        print("\n[+] Stopping Live Capture")
+        print("\n[+] Stopping Live Capture...")
+        
         if self.capture:
             with suppress(Exception):
-                self.capture.close() # Finally close the capture object safely
+                self.capture.close()  # Safely close capture object
     
     def process_packet(self, packet):
-        """Process Packets Info according to their info"""
+        """
+        Processes captured packets and prints relevant information.
+        :param packet: The captured network packet.
+        """
         try:
-            print("-"*40)
+            print("-" * 40)
+            
             if self.raw:
-                print(packet)
+                print(packet)  # Print raw packet details
             else:
-                if hasattr(packet, "ip"): # Check if it has a IP layer
-                    print(f"Source IP: {packet.ip.src} -> Dest. Ip {packet.ip.dst}")
-                    if hasattr(packet, "tcp"): # If TCP
-                        print(f"Protocol: TCP | Port: {packet.tcp.dstport}")
-                    elif hasattr(packet, "udp"): # If UDP
-                        print(f"Protocol: UDP | Port: {packet.udp.dstport}")
-            self.log_packet(packet=packet)
+                if hasattr(packet, "ip"):  # Check if packet has an IP layer
+                    print(f"Source IP: {packet.ip.src} -> Destination IP: {packet.ip.dst}")
+                    
+                    if hasattr(packet, "tcp"):  # TCP packets
+                        print(f"Protocol: TCP | Destination Port: {packet.tcp.dstport}")
+                    elif hasattr(packet, "udp"):  # UDP packets
+                        print(f"Protocol: UDP | Destination Port: {packet.udp.dstport}")
+            
+            self.log_packet(packet)  # Log packet details to file
+        
         except AttributeError:
-            pass # Skip packets without IP Layer
-    
+            pass  # Skip packets without necessary attributes
+
     def start_pkt_capture(self, raw=False, filter=None):
-        """Start capturing packets"""
-        # Setup signal handler
+        """
+        Starts live packet capture on the specified interface.
+        :param raw: Whether to display raw packet details.
+        :param filter: A BPF filter string.
+        """
+        # Handle Ctrl+C interrupt to stop capture
         signal.signal(signal.SIGINT, self.handle_interrupt)
         
-        print(f"[+] Started Sniffer at {self.interface}")
+        print(f"[+] Started Sniffer on interface: {self.interface}")
         print("[+] Press Ctrl+C to Stop")
 
-        if raw:
-            self.raw = True
+        self.raw = raw  # Set raw mode
 
         try:
-            self.setup_capture(filter=filter)
+            self.setup_capture(filter=filter)  # Initialize capture
 
-            self.capture.apply_on_packets(
-                self.process_packet,
-                timeout=None
-            )
+            # Process packets in real-time
+            self.capture.apply_on_packets(self.process_packet, timeout=None)
+
         except Exception as e:
             if self.is_running:
                 print(f"[!] Error: {e}")
+
         finally:
+            # Ensure capture object is closed properly
             if self.capture:
                 with suppress(Exception):
                     self.capture.close()
                 print("[+] Capture Object Closed")
+            
             if self.is_running:
                 print("\n[+] Sniffer Stopped")
 
+# Main Execution Block
 if __name__ == "__main__":
-    raw = input("Raw Packets? (y/n): ")
-    if raw == "y":
-        raw = True
-    else:
-        raw = False
-    
-    filter = input("Do you want to apply any filter (eg. src 192.168.1.5): ")
-    sniffer = PktSniffer()
-    sniffer.start_pkt_capture(raw=raw, filter=filter)
+    # Ask user whether to show raw packets
+    raw_input = input("Show raw packets? (y/n): ").strip().lower()
+    raw = True if raw_input == "y" else False
+
+    # Ask user for a packet filter (optional)
+    filter_input = input("Apply a packet filter? (e.g., 'src 192.168.1.5'): ").strip()
+    filter_str = filter_input if filter_input else None
+
+    # Initialize and start the sniffer
+    sniffer = PacketSniffer()
+    sniffer.start_pkt_capture(raw=raw, filter=filter_str)
