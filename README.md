@@ -1,2 +1,3 @@
 # NetHawk
-my try at creating a network recon tool
+A Multi-tool for Network Recon (Reconnaissance)
+this is still in development so stick around to see more features being added!
