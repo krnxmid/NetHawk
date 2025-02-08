@@ -59,19 +59,25 @@ class PacketSniffer:
         :param packet: The captured network packet.
         """
         try:
-            print("-" * 40)
-            
             if self.raw:
+                print("\n" + "═" * 60)
                 print(packet)  # Print raw packet details
+                print("═" * 60)
             else:
                 if hasattr(packet, "ip"):  # Check if packet has an IP layer
-                    print(f"Source IP: {packet.ip.src} -> Destination IP: {packet.ip.dst}")
+                    print("\n" + "═" * 60)
+                    print(f"{'Source IP':<20}: {packet.ip.src}")
+                    print(f"{'Destination IP':<20}: {packet.ip.dst}")
                     
                     if hasattr(packet, "tcp"):  # TCP packets
-                        print(f"Protocol: TCP | Destination Port: {packet.tcp.dstport}")
+                        print(f"{'Protocol':<20}: TCP")
+                        print(f"{'Destination Port':<20}: {packet.tcp.dstport}")
                     elif hasattr(packet, "udp"):  # UDP packets
-                        print(f"Protocol: UDP | Destination Port: {packet.udp.dstport}")
-            
+                        print(f"{'Protocol':<20}: UDP")
+                        print(f"{'Destination Port':<20}: {packet.udp.dstport}")
+                    
+                    print("═" * 60)
+
             self.log_packet(packet)  # Log packet details to file
         
         except AttributeError:
