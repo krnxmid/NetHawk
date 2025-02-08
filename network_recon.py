@@ -99,7 +99,7 @@ class WifiRecon:
             # print("\n" + "=" * 80)
             print("\n[+] Connected Clients:")
             # print("=" * 80)
-            print(f"\n{tabulate(hosts, headers=["IP Address", "Hostname", "MAC Address", "Vendor"], tablefmt="grid")}")
+            print(f"\n{tabulate(hosts, headers=["IP Address", "Hostname", "MAC Address", "Vendor"], tablefmt="double_grid")}")
             # print("=" * 80)
         else:
             print("[!] No active devices found on the network.")
@@ -153,7 +153,7 @@ class WifiRecon:
         # print("\n" + "=" * 80)
         print("[*] Available Wi-Fi Networks:")
         # print("=" * 80)
-        print(f"\n{tabulate(wifi_data, headers=["SSID", "BSSID", "Signal %", "Security", "Frequency", "Channel"], tablefmt="grid")}")
+        print(f"\n{tabulate(wifi_data, headers=["SSID", "BSSID", "Signal %", "Security", "Frequency", "Channel"], tablefmt="double_grid")}")
         # print("=" * 80)
 
 if __name__ == "__main__":
