@@ -177,4 +177,5 @@ When contributing to this project:
 
 ## License
 
-Please refer to the project's license file for usage terms and conditions.
+MIT License
+Copyright (c) 2025 KRNXMID
