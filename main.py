@@ -5,9 +5,9 @@ from packet_sniffer import PacketSniffer
 
 # Function to display a header
 def print_header(title):
-    print(Fore.CYAN + "=" * 50)
+    print(Fore.CYAN + "═" * 50)
     print(Fore.YELLOW + title.center(50))
-    print(Fore.CYAN + "=" * 50 + Style.RESET_ALL)
+    print(Fore.CYAN + "═" * 50 + Style.RESET_ALL)
 
 # Function to show a loading effect
 def loading_animation(message="Processing"):
@@ -16,6 +16,23 @@ def loading_animation(message="Processing"):
         time.sleep(0.5)
         print(".", end="", flush=True)
     print("\n" + Style.RESET_ALL)
+
+# Function to display the banner from 'banner.txt'
+def print_banner():
+    # Get the absolute path of the banner.txt file
+    import os
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    banner_path = os.path.join(script_dir, 'banner.txt')
+    
+    try:
+        with open(banner_path, 'r', encoding='utf-8') as file:
+            banner = file.read()
+            print(banner)
+    except UnicodeDecodeError:
+        print("Error: Could not decode the file. It might contain non-UTF-8 characters.")
+    except FileNotFoundError:
+        print(f"Error: The file {banner_path} does not exist.")
+
 
 def run_sniff_function(method_name):
     # Create an instance of WifiRecon
@@ -33,7 +50,6 @@ def run_sniff_function(method_name):
     log_pkt_str = True if log_pkt == "y" else False
 
     # Get the method dynamically by name
-
     tshark = PacketSniffer(interface=interface_str)
     print(Fore.BLUE + f"\n[INFO] Running {method_name}...\n" + Style.RESET_ALL)
     loading_animation("Executing")
@@ -89,6 +105,9 @@ def run_wifi_function(method_name):
 
 # Main menu loop
 def main():
+    # Print the banner from 'banner.txt'
+    print_banner()
+
     while True:
         print_header("NetHawk - Network Tools")
 
@@ -100,7 +119,7 @@ def main():
         print(Fore.GREEN + "[6] Get MAC Address" + Style.RESET_ALL)
         print(Fore.RED + "[x] Exit" + Style.RESET_ALL)
 
-        choice = input("\nEnter choice: ")
+        choice = input(f"\n{Fore.GREEN}>>>{Style.RESET_ALL} Enter choice: ")
 
         if choice == "1":
             run_wifi_function("scan_wifi")  # Run the Wi-Fi scan method

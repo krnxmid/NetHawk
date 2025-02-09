@@ -5,6 +5,7 @@ import socket
 from scapy.all import ARP, Ether, srp
 import requests
 from tabulate import tabulate
+from colorama import Fore, Style  # Added colorama for coloring outputs
 
 class WifiRecon:
     """
@@ -21,7 +22,7 @@ class WifiRecon:
 
     def get_vendor(self, mac):
         """Fetch the vendor name using the MAC address lookup API."""
-        print("[+] Getting vendor through reverse-searching Mac...")
+        print(Fore.GREEN + "[+] Getting vendor through reverse-searching Mac..." + Style.RESET_ALL)
         url = f"https://api.macvendors.com/{mac}"
 
         try:
@@ -31,12 +32,12 @@ class WifiRecon:
             else:
                 return "Unknown"
         except Exception as e:
-            print("[!] Couldn't retrieve vendor information:", e)
+            print(Fore.RED + "[!] Couldn't retrieve vendor information:", e + Style.RESET_ALL)
             return "Unknown"
 
     def get_mac_address(self, ip):
         """Retrieve the MAC address of a device on the local network using ARP requests."""
-        print("[+] Trying another method for Mac...")
+        print(Fore.GREEN + "[+] Trying another method for Mac..." + Style.RESET_ALL)
         arp = ARP(pdst=ip)
         ether = Ether(dst="ff:ff:ff:ff:ff:ff")
         packet = ether / arp
@@ -55,7 +56,7 @@ class WifiRecon:
             hostname = socket.gethostbyaddr(ip)[0]
             if hostname != ip:
                 return hostname
-            print("[+] Socket method didn't work trying next...")
+            print(Fore.YELLOW + "[+] Socket method didn't work trying next..." + Style.RESET_ALL)
         except socket.herror:
             pass  # Continue if reverse lookup fails
 
@@ -74,40 +75,37 @@ class WifiRecon:
     def scan_network(self):
         """Scan the local network for active devices using Nmap and display results in a table."""
         nm = nmap.PortScanner()
-        print("\n[*] Scanning network, please wait...")
+        print(Fore.CYAN + "\n[*] Scanning network, please wait..." + Style.RESET_ALL)
         nm.scan(hosts=self.network_range, arguments="-sn")  # Perform a ping scan
 
         hosts = []
         
         for host in nm.all_hosts():
             ip = host
-            print(f"[+] IP address: {ip}")
-            print("[+] Getting MAC address..")
+            print(Fore.GREEN + f"[+] IP address: {ip}" + Style.RESET_ALL)
+            print(Fore.YELLOW + "[+] Getting MAC address..." + Style.RESET_ALL)
             mac = nm[host]["addresses"].get("mac", self.get_mac_address(ip))
-            print(f"[+] MAC address: {mac}")
-            print("[+] Getting Vendor..")
+            print(Fore.GREEN + f"[+] MAC address: {mac}" + Style.RESET_ALL)
+            print(Fore.YELLOW + "[+] Getting Vendor..." + Style.RESET_ALL)
             vendor = nm[host]["vendor"].get(mac, self.get_vendor(mac))
-            print(f"[+] Vendor Found: {vendor}")
-            print("[+] Getting hostname...")
+            print(Fore.GREEN + f"[+] Vendor Found: {vendor}" + Style.RESET_ALL)
+            print(Fore.YELLOW + "[+] Getting hostname..." + Style.RESET_ALL)
             hostname = self.get_hostname(ip)
-            print(f"[+] Found hostname: {hostname}")
+            print(Fore.GREEN + f"[+] Found hostname: {hostname}" + Style.RESET_ALL)
 
             # Append to the hosts list for tabular display
             hosts.append([ip, hostname, mac, vendor])
 
         # Display results in table format
         if hosts:
-            # print("\n" + "=" * 80)
-            print("\n[+] Connected Clients:")
-            # print("=" * 80)
-            print(f"\n{tabulate(hosts, headers=["IP Address", "Hostname", "MAC Address", "Vendor"], tablefmt="double_grid")}")
-            # print("=" * 80)
+            print(Fore.CYAN + "\n[+] Connected Clients:" + Style.RESET_ALL)
+            print(Fore.GREEN + f"\n{tabulate(hosts, headers=['IP Address', 'Hostname', 'MAC Address', 'Vendor'], tablefmt='double_grid')}" + Style.RESET_ALL)
         else:
-            print("[!] No active devices found on the network.")
+            print(Fore.RED + "[!] No active devices found on the network." + Style.RESET_ALL)
     
     def scan_wifi(self, show_info=False):
         """Scan for available Wi-Fi networks (Windows-only) and display more details."""
-        print("\n[+] Scanning available Wi-Fi networks...")
+        print(Fore.CYAN + "\n[+] Scanning available Wi-Fi networks..." + Style.RESET_ALL)
 
         # Run netsh command
         result = subprocess.run(
@@ -119,7 +117,7 @@ class WifiRecon:
 
         # Check if any networks are found
         if "SSID" not in output:
-            print("[!] No Wi-Fi networks found.")
+            print(Fore.RED + "[!] No Wi-Fi networks found." + Style.RESET_ALL)
             return
 
         # Regex patterns to extract information
@@ -151,11 +149,8 @@ class WifiRecon:
             ])
 
         # Print table using tabulate
-        # print("\n" + "=" * 80)
-        print("[*] Available Wi-Fi Networks:")
-        # print("=" * 80)
-        print(f"\n{tabulate(wifi_data, headers=["SSID", "BSSID", "Signal %", "Security", "Frequency", "Channel"], tablefmt="double_grid")}")
-        # print("=" * 80)
+        print(Fore.CYAN + "[*] Available Wi-Fi Networks:" + Style.RESET_ALL)
+        print(Fore.GREEN + f"\n{tabulate(wifi_data, headers=['SSID', 'BSSID', 'Signal %', 'Security', 'Frequency', 'Channel'], tablefmt='double_grid')}" + Style.RESET_ALL)
 
 if __name__ == "__main__":
     wifi_recon = WifiRecon()
