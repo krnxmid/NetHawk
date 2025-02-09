@@ -1,5 +1,9 @@
 # NetHawk Documentation
 
+![image](https://github.com/user-attachments/assets/ce17c0e7-b1e7-44e5-9206-961b64585a3a)
+
+
+
 NetHawk is a powerful network reconnaissance multi-tool built in Python that provides various capabilities for network analysis and monitoring in Windows. This tool combines multiple network investigation features into a single, user-friendly interface.
 
 ## Directory Structure
