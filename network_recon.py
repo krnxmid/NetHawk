@@ -56,7 +56,7 @@ class WifiRecon:
             hostname = socket.gethostbyaddr(ip)[0]
             if hostname != ip:
                 return hostname
-            print(Fore.YELLOW + "[+] Socket method didn't work trying next..." + Style.RESET_ALL)
+            print(Fore.BLUE + "[+] Socket method didn't work trying next..." + Style.RESET_ALL)
         except socket.herror:
             pass  # Continue if reverse lookup fails
 
@@ -82,16 +82,16 @@ class WifiRecon:
         
         for host in nm.all_hosts():
             ip = host
-            print(Fore.GREEN + f"[+] IP address: {ip}" + Style.RESET_ALL)
-            print(Fore.YELLOW + "[+] Getting MAC address..." + Style.RESET_ALL)
+            print(Fore.GREEN + f"[+] IP address: {Fore.WHITE}{ip}" + Style.RESET_ALL)
+            print(Fore.BLUE + "[+] Getting MAC address..." + Style.RESET_ALL)
             mac = nm[host]["addresses"].get("mac", self.get_mac_address(ip))
-            print(Fore.GREEN + f"[+] MAC address: {mac}" + Style.RESET_ALL)
-            print(Fore.YELLOW + "[+] Getting Vendor..." + Style.RESET_ALL)
+            print(Fore.GREEN + f"[+] MAC address: {Fore.WHITE}{mac}" + Style.RESET_ALL)
+            print(Fore.BLUE + "[+] Getting Vendor..." + Style.RESET_ALL)
             vendor = nm[host]["vendor"].get(mac, self.get_vendor(mac))
-            print(Fore.GREEN + f"[+] Vendor Found: {vendor}" + Style.RESET_ALL)
-            print(Fore.YELLOW + "[+] Getting hostname..." + Style.RESET_ALL)
+            print(Fore.GREEN + f"[+] Vendor Found: {Fore.WHITE}{vendor}" + Style.RESET_ALL)
+            print(Fore.BLUE + "[+] Getting hostname..." + Style.RESET_ALL)
             hostname = self.get_hostname(ip)
-            print(Fore.GREEN + f"[+] Found hostname: {hostname}" + Style.RESET_ALL)
+            print(Fore.GREEN + f"[+] Found hostname: {Fore.WHITE}{hostname}" + Style.RESET_ALL)
 
             # Append to the hosts list for tabular display
             hosts.append([ip, hostname, mac, vendor])
