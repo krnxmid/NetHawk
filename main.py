@@ -2,6 +2,7 @@ import time
 from colorama import Fore, Style
 from network_recon import WifiRecon  # Importing your class
 from packet_sniffer import PacketSniffer
+import os
 
 # Function to display a header
 def print_header(title):
@@ -126,13 +127,16 @@ def main():
         elif choice == "2":
             run_wifi_function("scan_network")  # Run the ARP scan method
         elif choice == "3":
-            run_sniff_function()
+            run_sniff_function("start_pkt_capture")
         elif choice == "4":
             run_wifi_function("get_vendor")  # Run the Get Vendor method
         elif choice == "5":
             run_wifi_function("get_hostname")  # Run the Get Hostname method
         elif choice == "6":
             run_wifi_function("get_mac_address")  # Run the Get MAC Address method
+        elif choice == "clear":
+            os.system("cls")
+            print_banner()
         elif choice == "x":
             print(Fore.RED + "\n[INFO] Exiting...\n" + Style.RESET_ALL)
             break
@@ -141,4 +145,7 @@ def main():
             time.sleep(1)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit()
