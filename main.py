@@ -14,7 +14,7 @@ def print_header(title):
 def loading_animation(message="Processing"):
     print(Fore.GREEN + message, end="", flush=True)
     for _ in range(3):
-        time.sleep(0.5)
+        time.sleep(0.1)
         print(".", end="", flush=True)
     print("\n" + Style.RESET_ALL)
 
