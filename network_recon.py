@@ -23,6 +23,7 @@ class WifiRecon:
         """Fetch the vendor name using the MAC address lookup API."""
         print("[+] Getting vendor through reverse-searching Mac...")
         url = f"https://api.macvendors.com/{mac}"
+
         try:
             response = requests.get(url, timeout=5)
             if response.status_code == 200:

@@ -17,6 +17,7 @@ class PacketSniffer:
         self.capture = None  # Pyshark capture object
         self.is_running = True  # Flag to control capturing state
         self.raw = False  # Whether to show raw packet data
+        self.log_pkt = False
     
     def log_packet(self, packet):
         """
@@ -77,13 +78,13 @@ class PacketSniffer:
                         print(f"{'Destination Port':<20}: {packet.udp.dstport}")
                     
                     print("═" * 60)
-
-            self.log_packet(packet)  # Log packet details to file
+            if self.log_pkt:
+                self.log_packet(packet)  # Log packet details to file
         
         except AttributeError:
             pass  # Skip packets without necessary attributes
 
-    def start_pkt_capture(self, raw=False, filter=None):
+    def start_pkt_capture(self, raw=False, filter=None, log_pkt=False):
         """
         Starts live packet capture on the specified interface.
         :param raw: Whether to display raw packet details.
@@ -95,6 +96,7 @@ class PacketSniffer:
         print(f"[+] Started Sniffer on interface: {self.interface}")
         print("[+] Press Ctrl+C to Stop")
 
+        self.log_pkt= log_pkt
         self.raw = raw  # Set raw mode
 
         try:
