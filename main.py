@@ -6,9 +6,9 @@ import os
 
 # Function to display a header
 def print_header(title):
-    print(Fore.WHITE + "═" * 50)
+    print(Fore.BLUE + "═" * 50)
     print(Fore.GREEN + title.center(50))
-    print(Fore.WHITE + "═" * 50 + Style.RESET_ALL)
+    print(Fore.BLUE + "═" * 50 + Style.RESET_ALL)
 
 # Function to show a loading effect
 def loading_animation(message="Processing"):
@@ -112,13 +112,13 @@ def main():
     while True:
         print_header("NetHawk - Network Tools")
 
-        print(Fore.GREEN + "\n[1] Scan Nearby Wi-Fi")
-        print(Fore.GREEN + "[2] ARP Scan connected clients" + Style.RESET_ALL)
-        print(Fore.GREEN + "[3] Sniff Network Packets" + Style.RESET_ALL)
-        print(Fore.GREEN + "[4] Get Vendor Name" + Style.RESET_ALL)
-        print(Fore.GREEN + "[5] Get Hostname" + Style.RESET_ALL)
-        print(Fore.GREEN + "[6] Get MAC Address" + Style.RESET_ALL)
-        print(Fore.GREEN + "\n[x] Exit" + Style.RESET_ALL)
+        print(Fore.BLUE + "\n[1]" + Fore.GREEN + " Scan Nearby Wi-Fi")
+        print(Fore.BLUE + "[2]" + Fore.GREEN + " ARP Scan connected clients" + Style.RESET_ALL)
+        print(Fore.BLUE + "[3]" + Fore.GREEN + " Sniff Network Packets" + Style.RESET_ALL)
+        print(Fore.BLUE + "[4]" + Fore.GREEN + " Get Vendor Name" + Style.RESET_ALL)
+        print(Fore.BLUE + "[5]" + Fore.GREEN + " Get Hostname" + Style.RESET_ALL)
+        print(Fore.BLUE + "[6]" + Fore.GREEN + " Get MAC Address" + Style.RESET_ALL)
+        print(Fore.BLUE + "\n[x]" + Fore.GREEN + " Exit" + Style.RESET_ALL)
 
         choice = input(f"\n{Fore.GREEN}>>>{Style.RESET_ALL} Enter choice: ")
 
